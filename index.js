@@ -38,11 +38,18 @@ server.get("/api/users/:id", async (req, res) => {
 
 server.post("/api/users", async (req, res) => {
   const newUser = req.body;
-  try {
-    const insertedUser = await db.insert(newUser);
-    res.status(201).json({ success: true, newUserId: insertedUser });
-  } catch (error) {
-    res.status(500).json({ success: false, error });
+  if (newUser.name && newUser.bio) {
+    try {
+      const insertedUser = await db.insert(newUser);
+      res.status(201).json({ success: true, newUserId: insertedUser });
+    } catch (error) {
+      res.status(500).json({ success: false, error });
+    }
+  } else {
+    res.status(400).json({
+      success: false,
+      message: "Please provide name and bio for the user."
+    });
   }
 });
 
@@ -63,28 +70,31 @@ server.delete("/api/users/:id", async (req, res) => {
 server.put("/api/users/:id", async (req, res) => {
   const { id } = req.params;
   const changes = req.body;
-  const updatedDate = Date(Date.now());
-  const updatedDateString = updatedDate.toString();
-  console.log(updatedDateString);
-  const totalChanges = { ...changes, updated_at: updatedDateString };
-  try {
-    const updated = await db.update(id, totalChanges);
-    updated
-      ? res.status(204).end()
-      : res
-          .status(404)
-          .json({ success: false, message: "no user found by that id" });
-  } catch (error) {
-    res.status(500).json({ success: false, error });
+  if (changes.name && changes.bio) {
+    const updatedDate = Date(Date.now()).toString();
+    const totalChanges = { ...changes, updated_at: updatedDate };
+    try {
+      const updated = await db.update(id, totalChanges);
+      updated
+        ? res.status(204).end()
+        : res
+            .status(404)
+            .json({ success: false, message: "no user found by that id" });
+    } catch (error) {
+      res.status(500).json({ success: false, error });
+    }
+  } else {
+    res.status(400).json({
+      success: false,
+      message: "Please provide name and bio for the user."
+    });
   }
 });
 server.patch("/api/users/:id", async (req, res) => {
   const { id } = req.params;
   const changes = req.body;
-  const updatedDate = Date(Date.now());
-  const updatedDateString = updatedDate.toString();
-  console.log(updatedDateString);
-  const totalChanges = { ...changes, updated_at: updatedDateString };
+  const updatedDate = Date(Date.now()).toString();
+  const totalChanges = { ...changes, updated_at: updatedDate };
   try {
     const updated = await db.update(id, totalChanges);
     updated
