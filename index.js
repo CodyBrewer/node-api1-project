@@ -45,3 +45,54 @@ server.post("/api/users", async (req, res) => {
     res.status(500).json({ success: false, error });
   }
 });
+
+server.delete("/api/users/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deleted = await db.remove(id);
+    deleted
+      ? res.status(204).end()
+      : res
+          .status(404)
+          .json({ success: false, message: "no user found by that id" });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+});
+
+server.put("/api/users/:id", async (req, res) => {
+  const { id } = req.params;
+  const changes = req.body;
+  const updatedDate = Date(Date.now());
+  const updatedDateString = updatedDate.toString();
+  console.log(updatedDateString);
+  const totalChanges = { ...changes, updated_at: updatedDateString };
+  try {
+    const updated = await db.update(id, totalChanges);
+    updated
+      ? res.status(204).end()
+      : res
+          .status(404)
+          .json({ success: false, message: "no user found by that id" });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+});
+server.patch("/api/users/:id", async (req, res) => {
+  const { id } = req.params;
+  const changes = req.body;
+  const updatedDate = Date(Date.now());
+  const updatedDateString = updatedDate.toString();
+  console.log(updatedDateString);
+  const totalChanges = { ...changes, updated_at: updatedDateString };
+  try {
+    const updated = await db.update(id, totalChanges);
+    updated
+      ? res.status(204).end()
+      : res
+          .status(404)
+          .json({ success: false, message: "no user found by that id" });
+  } catch (error) {
+    res.status(500).json({ success: false, error });
+  }
+});
